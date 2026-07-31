@@ -42,15 +42,15 @@ const ReviwesYandex = () => {
                 borderRadius: "8px",
                 boxSizing: "border-box",
               }}
-              src="https://yandex.ru/maps-reviews-widget/153937465584?comments"
+              src="https://yandex.ru/maps-reviews-widget/153217679303?comments"
             />
           )}
           <a
-            href="https://yandex.ru/maps/org/usadba_izmaylovo/153937465584/"
+            href="https://yandex.com/maps/org/garant_strakhovaniye/153217679303/"
             target="_blank"
             rel="nofollow noopener"
           >
-            Усадьба Измайлово на карте Москвы — Яндекс.Карты
+            Гарант Страхование на карте Москвы — Яндекс.Карты
           </a>
         </div>
       </section>
