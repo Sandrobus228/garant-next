@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ReactNode } from "react";
 
 import styles from "./OsagoApplyFields.module.scss";
 
@@ -8,6 +8,7 @@ import { Control, UseFormClearErrors, UseFormTrigger } from "react-hook-form";
 import CustomTitle from "@/components/ui/CustomTitle/CustomTitle";
 import DynamicFormSection from "@/components/entities/DynamicFormSection/DynamicFormSection";
 import { CustomSwitch } from "@/components/ui/CustomSwitch/CustomSwitch";
+import { IS_PROMOCODE_ENABLED } from "@/constants/promocode.constants";
 
 interface IProps {
   config: ISplitFieldConfig;
@@ -15,6 +16,7 @@ interface IProps {
   clearErrors?: UseFormClearErrors<IOsagoApplyForm>;
   isOwner: boolean;
   setIsOwner: (value: boolean) => void;
+  priceSlot?: ReactNode;
 }
 
 const OsagoApplyFields = ({
@@ -23,20 +25,48 @@ const OsagoApplyFields = ({
   clearErrors,
   isOwner,
   setIsOwner,
+  priceSlot,
 }: IProps) => {
   return (
     <>
       <div className={styles.section}>
-        <CustomTitle tag="h2">Транспортное средство</CustomTitle>
+        <CustomTitle tag="h2">Тариф страхования</CustomTitle>
 
         <div className={styles.inputsWrapper}>
-          {config.vehicle && (
+          {config.tariff && (
             <DynamicFormSection
               clearErrors={clearErrors}
-              fields={config.vehicle}
+              fields={config.tariff}
               control={control}
               className={styles.input}
               isTopItemSingle
+            />
+          )}
+        </div>
+
+        {IS_PROMOCODE_ENABLED && config.promocode && (
+          <DynamicFormSection
+            clearErrors={clearErrors}
+            fields={config.promocode}
+            control={control}
+          />
+        )}
+
+        {priceSlot}
+      </div>
+
+      <div className={styles.section}>
+        <CustomTitle tag="h2" className={styles.sectionTitle}>
+          Транспортное средство
+        </CustomTitle>
+
+        <div className={styles.inputsWrapper}>
+          {config.vehicleDetails && (
+            <DynamicFormSection
+              clearErrors={clearErrors}
+              fields={config.vehicleDetails}
+              control={control}
+              className={styles.input}
             />
           )}
         </div>
@@ -84,31 +114,6 @@ const OsagoApplyFields = ({
           </div>
         </div>
       )}
-
-      <div className={styles.section}>
-        <CustomTitle tag="h2" className={styles.sectionTitle}>
-          Срок пребывания
-        </CustomTitle>
-        <div className={styles.inputsWrapper}>
-          {config.duration && (
-            <DynamicFormSection
-              clearErrors={clearErrors}
-              fields={config.duration}
-              control={control}
-            />
-          )}
-        </div>
-      </div>
-
-      <div className={styles.section}>
-        {config.promocode && (
-          <DynamicFormSection
-            clearErrors={clearErrors}
-            fields={config.promocode}
-            control={control}
-          />
-        )}
-      </div>
     </>
   );
 };

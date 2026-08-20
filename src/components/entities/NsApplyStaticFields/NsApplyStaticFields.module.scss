@@ -12,11 +12,6 @@
   margin-top: 40px;
 }
 
-.promocodeInput {
-  margin-top: 100px;
-  width: calc(50% - 35px);
-}
-
 @media (max-width: 1149px) {
   .fieldsRow {
     display: block;
@@ -26,10 +21,5 @@
   .input {
     width: 100%;
     margin-top: 30px;
-  }
-
-  .promocodeInput {
-    width: 100%;
-    margin-top: 80px;
   }
 }

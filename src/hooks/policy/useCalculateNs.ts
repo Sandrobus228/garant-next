@@ -13,6 +13,9 @@ export function useCalculateNs() {
     mutationKey: ["paymentCalculationNs"],
     mutationFn: (data: ICalculateNsPolicyRequest) =>
       policiesService.calculateNsPolicy(data),
+    onMutate() {
+      setIsPromocodeError(false);
+    },
     onSuccess() {
       queryClient.invalidateQueries({
         queryKey: ["paymentCalculationNs"],

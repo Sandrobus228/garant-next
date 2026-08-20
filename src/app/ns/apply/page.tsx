@@ -1,6 +1,10 @@
 import NsApply from "@/components/widgets/NsApply/NsApply";
 import Breadcrumbs from "@/components/ui/Breadcrumbs/Breadcrumbs";
 import { PAGES } from "@/config/pages-url.config";
+import {
+  parseNsApplyPrefill,
+  TSearchParams,
+} from "@/helpers/Apply/applyPrefill.helper";
 import type { Metadata } from "next";
 
 import "react-day-picker/style.css";
@@ -10,7 +14,14 @@ export const metadata: Metadata = {
   description:
     "Оформление полиса от несчастного случая в Абхазии онлайн. Укажите данные застрахованных, срок пребывания и рассчитайте стоимость страховки.",
 };
-export default function NsApplyPage() {
+
+interface IProps {
+  searchParams: Promise<TSearchParams>;
+}
+
+export default async function NsApplyPage({ searchParams }: IProps) {
+  const prefill = parseNsApplyPrefill(await searchParams);
+
   return (
     <>
       <Breadcrumbs
@@ -20,7 +31,7 @@ export default function NsApplyPage() {
           { name: "Оформление", href: PAGES.NS_APPLY },
         ]}
       />
-      <NsApply />
+      <NsApply prefill={prefill} />
     </>
   );
 }

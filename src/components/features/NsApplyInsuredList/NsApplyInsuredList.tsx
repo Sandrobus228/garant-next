@@ -15,6 +15,7 @@ import {
 import NsApplyInsuredListItem from "@/components/entities/NsApplyInsuredListItem/NsApplyInsuredListItem";
 import Button from "@/components/ui/Button/Button";
 import { defaultInsuredValues } from "@/components/widgets/NsApply/NsApply";
+import { MAX_INSURED_COUNT } from "@/constants/insured.constants";
 
 interface IProps {
   control: Control<ICreateNsPolicyRequest, any, ICreateNsPolicyRequest>;
@@ -25,8 +26,6 @@ interface IProps {
 }
 
 const NsApplyInsuredList = ({ control, fields, append, remove, clearErrors }: IProps) => {
-  const MAX_INSURED_COUNT = 5;
-
   return (
     <div>
       {fields.map((field, index) => (

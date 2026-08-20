@@ -1,0 +1,98 @@
+.root {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 40px;
+  padding: 24px 30px;
+  background-color: #f4f6fb;
+  border: 1px solid var(--light-grey);
+  border-radius: 16px;
+}
+
+.ready {
+  background-color: #eef1ff;
+  border-color: #d6dcff;
+}
+
+.title {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 20px;
+  line-height: 128%;
+  color: var(--dark-grey);
+}
+
+.priceWrapper {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.preliminaryCost {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 18px;
+  line-height: 128%;
+  color: var(--grey);
+  text-decoration: line-through;
+}
+
+.finalCost {
+  font-family: var(--font-family);
+  font-weight: 700;
+  font-size: 26px;
+  line-height: 123%;
+  color: var(--blue);
+}
+
+.hint {
+  max-width: 420px;
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 15px;
+  line-height: 145%;
+  color: var(--grey);
+}
+
+.loading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 128%;
+  color: var(--grey);
+}
+
+.loader {
+  width: 22px !important;
+  height: 22px !important;
+  border-width: 3px !important;
+}
+
+@media (max-width: 1149px) {
+  .root {
+    margin-top: 30px;
+    padding: 16px 20px;
+    border-radius: 12px;
+  }
+
+  .title {
+    font-size: 16px;
+  }
+
+  .finalCost {
+    font-size: 20px;
+  }
+
+  .preliminaryCost {
+    font-size: 15px;
+  }
+
+  .hint {
+    font-size: 14px;
+  }
+}

@@ -11,6 +11,8 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 
 import { IOsagoApplyForm } from "@/types/OsagoApplyForm/IOsagoApplyForm";
+import { IOsagoPaymentCalculation } from "@/types/policy.types";
+import { IOsagoApplyPrefill } from "@/helpers/Apply/applyPrefill.helper";
 
 import { useOsagoFormConfig } from "@/hooks/useOsagoFormConfig";
 import { useGetCarBrands } from "@/hooks/cars/useGetCarBrands";
@@ -23,6 +25,7 @@ import Substrate from "@/components/ui/Substrate/Substrate";
 import Button from "@/components/ui/Button/Button";
 import Loader from "@/components/ui/Loader/Loader";
 import CountedPrice from "@/components/features/CountedPrice/CountedPrice";
+import TariffPrice from "@/components/features/TariffPrice/TariffPrice";
 
 import useOsagoApplyCarMark from "@/stores/OsagoApply/osagoApplyCarMark.store";
 import useCurrientCar from "@/stores/Cars/currientCar";
@@ -42,8 +45,24 @@ import { isAuthorized } from "@/helpers/auth/isAuthorized.helper";
 import useShadow from "@/stores/Shadow/shadow.store";
 import { ModalAuth } from "../ModalAuth/ModalAuth";
 
-const OsagoApply = () => {
+const TAXI_CATEGORY =
+  "Автотранспортные средства, используемые в качестве такси и по найму";
+const MINIMAL_DURATION = "До 15 суток";
+const DEFAULT_TAXI_DURATION = "До 30 суток";
+const DEFAULT_MINIMAL_DURATION_CATEGORY =
+  "Легковые автомобили, микроавтобусы с числом посадочных мест до 8 включительно";
+
+// небольшая задержка, чтобы не дёргать расчёт дважды,
+// когда категория и срок меняются друг за другом
+const AUTO_CALCULATION_DELAY = 350;
+
+interface IProps {
+  prefill?: IOsagoApplyPrefill;
+}
+
+const OsagoApply = ({ prefill }: IProps) => {
   const formRef = useRef<HTMLFormElement>(null);
+  const promocodeRef = useRef<string>("");
   const { reloadPage } = useNavigation();
 
   const { config, isLoading } = useOsagoFormConfig();
@@ -54,18 +73,23 @@ const OsagoApply = () => {
     control,
     reset,
     setValue,
+    getValues,
     watch,
-    trigger: formValidationTrigger,
     clearErrors,
     unregister,
-  } = useForm<IOsagoApplyForm>();
+  } = useForm<IOsagoApplyForm>({
+    defaultValues: {
+      transport_category: prefill?.transport_category || "",
+      duration_of_stay: prefill?.duration_of_stay || "",
+    },
+  });
 
   const [isCarsBrandsLoaded, setIsCarsBrandsLoaded] = useState(false);
-  const [isCountButtonClicked, setIsCountButtonClicked] =
-    useState<boolean>(false);
   const [isInitialLoaded, setIsInitialLoaded] = useState(false);
   const [isAuthVisible, setIsAuthVisible] = useState<boolean>(false);
   const [isOwner, setIsOwner] = useState<boolean>(true);
+  const [appliedPromocode, setAppliedPromocode] = useState<string>("");
+  const [price, setPrice] = useState<IOsagoPaymentCalculation | undefined>();
 
   const currientCar = useCurrientCar((state) => state.car);
   const setIsAnotherCarMark = useOsagoApplyCarMark(
@@ -83,6 +107,9 @@ const OsagoApply = () => {
   const durationOsago = useCurrientCarCategoryAndDuration(
     (state) => state.duration
   );
+  const setCarCategoryOsago = useCurrientCarCategoryAndDuration(
+    (state) => state.setCarCategory
+  );
 
   const { carsBrands, isLoading: isCarsBrandsLoading } = useGetCarBrandsV2();
   const {
@@ -93,23 +120,58 @@ const OsagoApply = () => {
     mutate: mutatePaymentCalculation,
   } = useGetPaymentCalculation();
 
+  const [transportCategoryWatch, durationOfStayWatch, promocodeWatch] = watch([
+    "transport_category",
+    "duration_of_stay",
+    "promocode",
+  ]);
+  const brandWatch = watch(["brand"]);
+
   useEffect(() => {
-    if (
-      carCategoryOsago ===
-      "Автотранспортные средства, используемые в качестве такси и по найму"
-    ) {
-      setValue("duration_of_stay", "До 30 суток");
+    // такси нельзя оформить на 15 суток — подставляем ближайший доступный срок
+    if (carCategoryOsago !== TAXI_CATEGORY) return;
+
+    const currientDuration = getValues("duration_of_stay");
+
+    if (!currientDuration || currientDuration === MINIMAL_DURATION) {
+      setValue("duration_of_stay", DEFAULT_TAXI_DURATION);
     }
   }, [carCategoryOsago]);
 
   useEffect(() => {
-    if (durationOsago === "До 15 суток") {
-      setValue(
-        "transport_category",
-        "Легковые автомобили, микроавтобусы с числом посадочных мест до 8 включительно"
-      );
+    // на 15 суток доступны только легковые — остальные категории не подменяем
+    if (durationOsago !== MINIMAL_DURATION) return;
+
+    const currientCategory = getValues("transport_category");
+
+    if (!currientCategory || currientCategory === TAXI_CATEGORY) {
+      setValue("transport_category", DEFAULT_MINIMAL_DURATION_CATEGORY);
     }
   }, [durationOsago]);
+
+  useEffect(() => {
+    // категория из ссылки может устареть — сверяем со списком с бэкенда
+    if (isLoading || !config.tariff) return;
+
+    const currientCategory = getValues("transport_category");
+
+    if (!currientCategory) return;
+
+    const categoryOptions = config.tariff.find(
+      (field) => field.name === "transport_category"
+    )?.options;
+
+    if (!categoryOptions) return;
+
+    const isKnownCategory = categoryOptions.some(
+      (option) => option.value === currientCategory
+    );
+
+    if (!isKnownCategory) {
+      setValue("transport_category", "");
+      setCarCategoryOsago("");
+    }
+  }, [isLoading]);
 
   useEffect(() => {
     if (carsBrands && !isCarsBrandsLoaded) {
@@ -175,6 +237,12 @@ const OsagoApply = () => {
   }, [currientCar, isCarsBrandsLoaded]);
 
   const onSubmit: SubmitHandler<IOsagoApplyForm> = (data) => {
+    if (!price) {
+      toast.error("Не удалось рассчитать стоимость. Проверьте тариф");
+      scrollToTariff();
+      return;
+    }
+
     if (!isAuthorized()) {
       toast.success("Войдите, чтобы продолжить", {
         duration: 4000,
@@ -182,13 +250,10 @@ const OsagoApply = () => {
 
       setIsAuthVisible(true);
     } else {
-      console.log("data");
-      console.log(data);
       const formatedData = formatDataToCreateOsagoRequest(data, isOwner);
-      console.log(formatedData);
 
       setPolicy(formatedData);
-      setPolicyCalculationData(paymentCalculationData);
+      setPolicyCalculationData(price);
 
       navigateToOsagoConfirm();
     }
@@ -198,16 +263,7 @@ const OsagoApply = () => {
     toast.error("Заполните все обязательные поля");
   }
 
-  const watchedFieldsWithPromocode = watch([
-    "transport_category",
-    "duration_of_stay",
-    "promocode",
-  ]);
-  const brandWatch = watch(["brand"]);
-
   async function resetForm(data?: Partial<IOsagoApplyForm>) {
-    console.log("Данные для подстановки");
-    console.log(data);
     await reset(data);
 
     setValue(
@@ -217,68 +273,73 @@ const OsagoApply = () => {
 
     const timeoutId = setTimeout(() => {
       setIsInitialLoaded(true);
-      // console.log("setIsInitialLoaded");
       clearTimeout(timeoutId);
     }, 900);
   }
 
-  const handleCountClick = () => {
-    setIsCountButtonClicked(true);
+  function scrollToTariff() {
+    formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
 
-    const isValid = formValidationTrigger();
-
-    if (!isValid) return;
-
-    console.log("watchedFieldsWithPromocode");
-    console.log(watchedFieldsWithPromocode);
-
-    if (watchedFieldsWithPromocode[1] === "") {
-      toast.error("Заполните данные");
-    } else {
-      mutatePaymentCalculation({
-        transport_category: watchedFieldsWithPromocode[0],
-        duration_of_stay: watchedFieldsWithPromocode[1],
-        promo_code: watchedFieldsWithPromocode[2],
-      });
+  // расчёт стоимости идёт сам, как только выбраны категория ТС и срок
+  useEffect(() => {
+    if (!transportCategoryWatch || !durationOfStayWatch) {
+      setPrice(undefined);
+      return;
     }
-  };
+
+    // ждём список категорий, чтобы не считать по значению из устаревшей ссылки
+    if (isLoading) return;
+
+    const timeoutId = setTimeout(() => {
+      mutatePaymentCalculation({
+        transport_category: transportCategoryWatch,
+        duration_of_stay: durationOfStayWatch,
+        promo_code: appliedPromocode,
+      });
+    }, AUTO_CALCULATION_DELAY);
+
+    return () => clearTimeout(timeoutId);
+  }, [transportCategoryWatch, durationOfStayWatch, appliedPromocode, isLoading]);
 
   useEffect(() => {
-    setIsCountButtonClicked(false);
-  }, [JSON.stringify(watchedFieldsWithPromocode)]);
+    if (isPaymentCalculationSuccess && paymentCalculationData) {
+      setPrice(paymentCalculationData);
+    }
+  }, [isPaymentCalculationSuccess, paymentCalculationData]);
+
+  useEffect(() => {
+    promocodeRef.current = promocodeWatch || "";
+
+    // промокод изменили — скидка действует только для применённого кода
+    if (appliedPromocode && promocodeWatch !== appliedPromocode) {
+      setAppliedPromocode("");
+    }
+  }, [promocodeWatch]);
+
+  useEffect(() => {
+    // кнопка «Применить» у поля промокода пересчитывает стоимость
+    setTrigger(() => setAppliedPromocode(promocodeRef.current));
+  }, []);
 
   useEffect(() => {
     if (isInitialLoaded || (!currientCar && !currientPolicy)) {
-      console.log("сброс значений");
       setValue("model", "");
       setValue("vehicle_refined_make", "");
     }
   }, [JSON.stringify(brandWatch)]);
 
   useEffect(() => {
-    setTrigger(() => {
-      setIsCountButtonClicked(false);
-    });
-  }, []);
-
-  useEffect(() => {
     let isMounted = true;
 
-    if (!isPaymentCalculationPending) {
-      toast.dismiss();
-    } else {
-      toast.loading("Загрузка");
-    }
-
     if (isPaymentCalculationError && isMounted) {
-      toast.dismiss();
       toast.error("Ошибка. Проверьте данные");
     }
 
     return () => {
       isMounted = false;
     };
-  }, [isPaymentCalculationPending, isPaymentCalculationError]);
+  }, [isPaymentCalculationError]);
 
   useEffect(() => {
     if (isOwner) {
@@ -295,7 +356,6 @@ const OsagoApply = () => {
   }
 
   function handleSuccessAuth() {
-    console.log("handleSuccessAuth");
     triggerSubmitForm();
     reloadPage();
     setIsAuthVisible(false);
@@ -339,18 +399,23 @@ const OsagoApply = () => {
                 clearErrors={clearErrors}
                 isOwner={isOwner}
                 setIsOwner={setIsOwner}
+                priceSlot={
+                  <TariffPrice
+                    isLoading={isPaymentCalculationPending}
+                    preliminaryCost={
+                      price ? Number(price.base_tarif) : undefined
+                    }
+                    finalCost={price ? Number(price.tarif) : undefined}
+                    hint="Появится, как только выберете категорию ТС и срок пребывания"
+                  />
+                }
               />
 
-              {isCountButtonClicked &&
-              !isPaymentCalculationPending &&
-              paymentCalculationData ? (
+              {price ? (
                 <CountedPrice
-                  discount={
-                    Number(paymentCalculationData.base_tarif) -
-                    Number(paymentCalculationData.tarif)
-                  }
-                  finalCost={Number(paymentCalculationData.tarif)}
-                  preliminaryCost={Number(paymentCalculationData.base_tarif)}
+                  discount={Number(price.base_tarif) - Number(price.tarif)}
+                  finalCost={Number(price.tarif)}
+                  preliminaryCost={Number(price.base_tarif)}
                   className={styles.priceWrapper}
                 />
               ) : (
@@ -358,10 +423,10 @@ const OsagoApply = () => {
                   type="button"
                   className={styles.countButton}
                   variant="wide"
-                  onClickEvent={handleCountClick}
+                  onClickEvent={scrollToTariff}
                   isLoading={isPaymentCalculationPending}
                 >
-                  Рассчитать
+                  Узнать стоимость
                 </Button>
               )}
             </form>

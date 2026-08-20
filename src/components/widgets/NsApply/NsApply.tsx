@@ -13,6 +13,7 @@ import Substrate from "@/components/ui/Substrate/Substrate";
 import { useFieldArray, useForm } from "react-hook-form";
 import {
   EGenders,
+  ICalculateNsPolicyResponseData,
   ICreateNsPolicyRequest,
   IInsuredCreationFilelds,
 } from "@/types/policy.types";
@@ -21,12 +22,14 @@ import Button from "@/components/ui/Button/Button";
 import NsApplyStaticFields from "@/components/entities/NsApplyStaticFields/NsApplyStaticFields";
 import { useCalculateNs } from "@/hooks/policy/useCalculateNs";
 import CountedPrice from "@/components/features/CountedPrice/CountedPrice";
+import TariffPrice from "@/components/features/TariffPrice/TariffPrice";
 import usePromocodeError from "@/stores/Promocode/promocodeError.store";
 import usePromocodeEvent from "@/stores/Promocode/promocodeEvent.store";
 import { useNavigation } from "@/hooks/navigation/useNavigation";
 import useCurrientNsPolicy from "@/stores/Policy/currientNsPolicy";
 import toast from "react-hot-toast";
 import { isAuthorized } from "@/helpers/auth/isAuthorized.helper";
+import { INsApplyPrefill } from "@/helpers/Apply/applyPrefill.helper";
 import { ModalAuth } from "../ModalAuth/ModalAuth";
 
 export const defaultInsuredValues: IInsuredCreationFilelds = {
@@ -36,12 +39,22 @@ export const defaultInsuredValues: IInsuredCreationFilelds = {
   passport_number: "",
 };
 
-const NsApply = () => {
+// небольшая задержка, чтобы не дёргать расчёт на каждое переключение
+const AUTO_CALCULATION_DELAY = 350;
+
+interface IProps {
+  prefill?: INsApplyPrefill;
+}
+
+const NsApply = ({ prefill }: IProps) => {
   const { reloadPage } = useNavigation();
   const formRef = useRef<HTMLFormElement>(null);
+  const promocodeRef = useRef<string>("");
 
-  const [isCalculatedBlockVisible, setIsCalculatedBlockVisible] =
-    useState<boolean>(false);
+  const [appliedPromocode, setAppliedPromocode] = useState<string>("");
+  const [price, setPrice] = useState<
+    ICalculateNsPolicyResponseData | undefined
+  >();
 
   const {
     data: calculateNsData,
@@ -68,14 +81,14 @@ const NsApply = () => {
     control,
     handleSubmit,
     watch,
-    formState,
     reset,
-    trigger: formValidationTrigger,
     clearErrors,
   } = useForm<ICreateNsPolicyRequest>({
     defaultValues: {
-      insured: [defaultInsuredValues],
-      duration_of_stay: "",
+      insured: Array.from({ length: prefill?.quantity || 1 }, () => ({
+        ...defaultInsuredValues,
+      })),
+      duration_of_stay: prefill?.duration_of_stay || "",
       promocode: "",
       start_date: "",
     },
@@ -86,41 +99,84 @@ const NsApply = () => {
     control,
   });
 
+  const quantity = fields.length;
+
   useEffect(() => {
     if (currientNsPolicy) {
       reset(currientNsPolicy);
     }
   }, [currientNsPolicy]);
 
+  const [durationOfStayWatch, promocodeWatch] = watch([
+    "duration_of_stay",
+    "promocode",
+  ]);
+
+  function handleQuantityChange(nextQuantity: number) {
+    if (nextQuantity > quantity) {
+      append(
+        Array.from({ length: nextQuantity - quantity }, () => ({
+          ...defaultInsuredValues,
+        }))
+      );
+    } else if (nextQuantity < quantity) {
+      remove(
+        Array.from(
+          { length: quantity - nextQuantity },
+          (_, index) => nextQuantity + index
+        )
+      );
+    }
+  }
+
+  // расчёт стоимости идёт сам, как только выбран срок пребывания
   useEffect(() => {
+    if (!durationOfStayWatch) {
+      setPrice(undefined);
+      return;
+    }
+
+    const timeoutId = setTimeout(() => {
+      calculateNsMutate({
+        duration_of_stay: durationOfStayWatch,
+        promocode: appliedPromocode,
+        quantity,
+      });
+    }, AUTO_CALCULATION_DELAY);
+
+    return () => clearTimeout(timeoutId);
+  }, [durationOfStayWatch, quantity, appliedPromocode]);
+
+  useEffect(() => {
+    if (isCalculateNsSuccess && calculateNsData) {
+      setPrice(calculateNsData);
+    }
+  }, [isCalculateNsSuccess, calculateNsData]);
+
+  useEffect(() => {
+    promocodeRef.current = promocodeWatch || "";
+
+    // промокод изменили — скидка действует только для применённого кода
+    if (appliedPromocode && promocodeWatch !== appliedPromocode) {
+      setAppliedPromocode("");
+    }
+  }, [promocodeWatch]);
+
+  useEffect(() => {
+    // кнопка «Применить» у поля промокода пересчитывает стоимость
     setTrigger(() => {
-      setIsCalculatedBlockVisible(false);
+      setPromocodeError(false);
+      setAppliedPromocode(promocodeRef.current);
     });
   }, []);
 
-  const fieldsToRecolculateWatch = watch(["duration_of_stay", "insured"]);
-
-  const watchedFields = watch(["duration_of_stay", "promocode", "insured"]);
-
-  function handleCalculateClick() {
-    const isValid = formValidationTrigger();
-
-    if (!isValid) return;
-
-    setPromocodeError(false);
-    setIsCalculatedBlockVisible(true);
-    calculateNsMutate({
-      duration_of_stay: watchedFields[0],
-      promocode: watchedFields[1],
-      quantity: watchedFields[2].length,
-    });
-  }
-
-  useEffect(() => {
-    setIsCalculatedBlockVisible(false);
-  }, [JSON.stringify(fieldsToRecolculateWatch)]);
-
   function onSubmit(data: ICreateNsPolicyRequest): void {
+    if (!price) {
+      toast.error("Не удалось рассчитать стоимость. Проверьте тариф");
+      scrollToTariff();
+      return;
+    }
+
     if (!isAuthorized()) {
       toast.success("Войдите, чтобы продолжить", {
         duration: 4000,
@@ -128,10 +184,8 @@ const NsApply = () => {
 
       setIsAuthVisible(true);
     } else {
-      console.log("form data:", data);
-
       setCurrientNsPolicy(data);
-      setCurrientNsPolicyCalculation(calculateNsData);
+      setCurrientNsPolicyCalculation(price);
 
       navigateToNsConfirm();
     }
@@ -141,29 +195,22 @@ const NsApply = () => {
     toast.error("Заполните все обязательные поля");
   }
 
+  function scrollToTariff() {
+    formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
   useEffect(() => {
-    let isMounted = true;
+    if (!isCalculateNsError) return;
 
-    if (!isCalculateNsPending) {
-      toast.dismiss();
+    if (isPromocodeError) {
+      toast.error("Введите действующий промокод или оставьте поле пустым");
+      setPromocodeError(true);
+      // считаем стоимость без промокода, чтобы цена осталась на экране
+      setAppliedPromocode("");
     } else {
-      toast.loading("Загрузка");
+      toast.error("Ошибка. Проверьте данные");
     }
-
-    if (isCalculateNsError && isMounted) {
-      toast.dismiss();
-
-      if (isPromocodeError) {
-        toast.error("Введите действующий промокод или оставьте поле пустым");
-      } else {
-        toast.error("Ошибка. Проверьте данные");
-      }
-    }
-
-    return () => {
-      isMounted = false;
-    };
-  }, [isCalculateNsPending, isCalculateNsError, isPromocodeError]);
+  }, [isCalculateNsError, isPromocodeError]);
 
   function triggerSubmitForm() {
     formRef.current?.dispatchEvent(
@@ -172,7 +219,6 @@ const NsApply = () => {
   }
 
   function handleSuccessAuth() {
-    console.log("handleSuccessAuth");
     triggerSubmitForm();
     reloadPage();
     setIsAuthVisible(false);
@@ -207,29 +253,37 @@ const NsApply = () => {
           onSubmit={handleSubmit(onSubmit, onFormError)}
         >
           <Substrate withShadow="light" className={styles.substrate}>
-            <NsApplyInsuredList
-              control={control}
-              fields={fields}
-              append={append}
-              remove={remove}
+            <NsApplyStaticFields
               clearErrors={clearErrors}
+              control={control}
+              quantity={quantity}
+              setQuantity={handleQuantityChange}
+              priceSlot={
+                <TariffPrice
+                  isLoading={isCalculateNsPending}
+                  preliminaryCost={price ? price.base_tariff : undefined}
+                  finalCost={price ? price.to_be_paid : undefined}
+                  hint="Появится, как только выберете срок пребывания"
+                />
+              }
             />
 
-            <div className={styles.staticFieldsWrapper}>
-              <NsApplyStaticFields
-                clearErrors={clearErrors}
+            <div className={styles.insuredListWrapper}>
+              <NsApplyInsuredList
                 control={control}
+                fields={fields}
+                append={append}
+                remove={remove}
+                clearErrors={clearErrors}
               />
             </div>
 
-            {calculateNsData &&
-            isCalculateNsSuccess &&
-            isCalculatedBlockVisible ? (
+            {price ? (
               <CountedPrice
                 className={styles.countedPrice}
-                finalCost={calculateNsData.to_be_paid}
-                preliminaryCost={calculateNsData.base_tariff}
-                discount={calculateNsData.discount}
+                finalCost={price.to_be_paid}
+                preliminaryCost={price.base_tariff}
+                discount={price.discount}
                 type="ns"
               />
             ) : (
@@ -237,10 +291,10 @@ const NsApply = () => {
                 type="button"
                 variant="wide"
                 className={styles.submitButton}
-                onClickEvent={handleCalculateClick}
+                onClickEvent={scrollToTariff}
                 isLoading={isCalculateNsPending}
               >
-                Рассчитать
+                Узнать стоимость
               </Button>
             )}
           </Substrate>

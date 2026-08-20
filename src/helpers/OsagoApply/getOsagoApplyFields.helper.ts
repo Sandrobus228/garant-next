@@ -6,6 +6,7 @@ import { useGetCarCategories } from "@/hooks/cars/useGetCarCategories";
 import { IOptions } from "@/components/ui/CustomSelect/CustomSelect";
 import useCarBrandsList from "@/stores/Cars/carBrandsList";
 import { ICarBrand } from "@/types/cars.types";
+import { osagoDurationOfStayOptions } from "./durationOfStay.data";
 import {
   getCarBrandsFromSessionStorage,
   saveCarBrandsToSessionStorage,
@@ -67,84 +68,116 @@ export default async function getOsagoApplyFields(): Promise<ISplitFieldConfig> 
 
   formatedCarBrands = formatedCarBrands;
 
+  const transportCategoryField: IFieldConfig<IOsagoApplyForm> = {
+    type: "select",
+    name: "transport_category",
+    label: "Категория ТС",
+    isSearchable: false,
+    placeholder: "Категория ТС",
+    required: true,
+    options: formatedCarCategories,
+  };
+
+  // поля самого ТС без категории: на оформлении она уходит в блок тарифа,
+  // а на страницах «Мои авто» остаётся в общем списке (config.vehicle)
+  const vehicleDetailsFields: IFieldConfig<IOsagoApplyForm>[] = [
+    {
+      type: "select",
+      name: "brand",
+      label: "Марка",
+      placeholder: "Начните вводить марку",
+      required: true,
+      tooltip: true,
+      tooltipText:
+        "Если вашего ТС нет в списке, в поле «Марка» выберите «Другое ТС»",
+      options: formatedCarBrands,
+      popularBrands: formatedPopularBrands,
+    },
+    {
+      type: "input",
+      name: "vehicle_refined_make",
+      label: "Уточните марку",
+      placeholder: "Введите марку",
+      required: false,
+    },
+    {
+      type: "select",
+      name: "model",
+      label: "Модель",
+      placeholder: "Модель",
+      tooltip: true,
+      tooltipText:
+        "Если вашего ТС нет в списке, в поле «Марка» выберите «Другое ТС»",
+      required: true,
+      options: [
+        {
+          label: "Сначала выберите марку",
+          value: "thumbnail",
+        },
+      ],
+    },
+    {
+      type: "select",
+      name: "year",
+      label: "Год выпуска ТС",
+      placeholder: "Год выпуска ТС",
+      required: true,
+      options: generateYearOptions(1980),
+      isSearchable: true,
+    },
+    {
+      type: "input",
+      name: "vin",
+      label: "VIN",
+      placeholder: "VIN",
+      required: true,
+    },
+    {
+      type: "input",
+      name: "registration_plate",
+      label: "Регистрационный знак",
+      placeholder: "А123АА | 999",
+      required: true,
+      inputType: "registration_plate",
+    },
+    {
+      type: "input",
+      name: "registration_number",
+      label: "Серия и номер регистрации ТС",
+      placeholder: "Серия и номер регистрации ТС",
+      required: true,
+    },
+  ];
+
   const fields: ISplitFieldConfig = {
-    vehicle: [
+    tariff: [
+      {
+        ...transportCategoryField,
+        // копия списка: DynamicFormSection правит опции на месте
+        options: formatedCarCategories.map((option) => ({ ...option })),
+      },
       {
         type: "select",
-        name: "transport_category",
-        label: "Категория ТС",
+        name: "duration_of_stay",
+        label: "Длительность пребывания",
+        placeholder: "Длительность пребывания",
         isSearchable: false,
-        placeholder: "Категория ТС",
         required: true,
-        options: formatedCarCategories,
-      },
-      {
-        type: "select",
-        name: "brand",
-        label: "Марка",
-        placeholder: "Начните вводить марку",
-        required: true,
-        tooltip: true,
-        tooltipText:
-          "Если вашего ТС нет в списке, в поле «Марка» выберите «Другое ТС»",
-        options: formatedCarBrands,
-        popularBrands: formatedPopularBrands,
+        options: osagoDurationOfStayOptions.map((option) => ({ ...option })),
       },
       {
         type: "input",
-        name: "vehicle_refined_make",
-        label: "Уточните марку",
-        placeholder: "Введите марку",
-        required: false,
-      },
-      {
-        type: "select",
-        name: "model",
-        label: "Модель",
-        placeholder: "Модель",
-        tooltip: true,
-        tooltipText:
-          "Если вашего ТС нет в списке, в поле «Марка» выберите «Другое ТС»",
+        name: "date_of_start",
+        label: "Дата начала",
+        placeholder: "Выберите дату",
+        inputType: "date",
         required: true,
-        options: [
-          {
-            label: "Сначала выберите марку",
-            value: "thumbnail",
-          },
-        ],
-      },
-      {
-        type: "select",
-        name: "year",
-        label: "Год выпуска ТС",
-        placeholder: "Год выпуска ТС",
-        required: true,
-        options: generateYearOptions(1980),
-        isSearchable: true,
-      },
-      {
-        type: "input",
-        name: "vin",
-        label: "VIN",
-        placeholder: "VIN",
-        required: true,
-      },
-      {
-        type: "input",
-        name: "registration_plate",
-        label: "Регистрационный знак",
-        placeholder: "А123АА | 999",
-        required: true,
-        inputType: "registration_plate",
-      },
-      {
-        type: "input",
-        name: "registration_number",
-        label: "Серия и номер регистрации ТС",
-        placeholder: "Серия и номер регистрации ТС",
-        required: true,
+        startDate: new Date(),
+        limitYears: true,
       },
     ],
+    vehicleDetails: vehicleDetailsFields,
+    vehicle: [transportCategoryField, ...vehicleDetailsFields],
     owner: [
       {
         type: "radio",
@@ -189,48 +222,6 @@ export default async function getOsagoApplyFields(): Promise<ISplitFieldConfig> 
         label: "Серия и номер паспорта",
         placeholder: "Введите серию и номер",
         required: true,
-      },
-    ],
-    duration: [
-      {
-        type: "select",
-        name: "duration_of_stay",
-        label: "Длительность пребывания",
-        placeholder: "Длительность пребывания",
-        isSearchable: false,
-        required: true,
-        options: [
-          {
-            label: "До 15 суток",
-            value: "До 15 суток",
-          },
-          {
-            label: "До 30 суток",
-            value: "До 30 суток",
-          },
-          {
-            label: "До 90 суток",
-            value: "До 90 суток",
-          },
-          {
-            label: "До 183 суток",
-            value: "До 183 суток",
-          },
-          {
-            label: "До 1 года",
-            value: "До 1 года",
-          },
-        ],
-      },
-      {
-        type: "input",
-        name: "date_of_start",
-        label: "Дата начала",
-        placeholder: "Выберите дату",
-        inputType: "date",
-        required: true,
-        startDate: new Date(),
-        limitYears: true,
       },
     ],
     promocode: [

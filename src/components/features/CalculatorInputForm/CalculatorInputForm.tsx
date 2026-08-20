@@ -22,6 +22,10 @@ import { calculatorPromoCategories, osagoTable } from "./tables.data";
 import { useGetCarCategories } from "@/hooks/cars/useGetCarCategories";
 import { useGetPaymentCalculation } from "@/hooks/policy/useGetPaymentCalculation";
 import { useCalculateNs } from "@/hooks/policy/useCalculateNs";
+import {
+  buildNsApplyHref,
+  buildOsagoApplyHref,
+} from "@/helpers/Apply/applyPrefill.helper";
 
 interface FormData {
   [key: string]: any;
@@ -306,6 +310,18 @@ const CalculatorInputForm = ({ config, variant }: IProps) => {
     console.log(data);
   }, [data]);
 
+  // параметры расчёта переносим в форму оформления, чтобы не выбирать их заново
+  const applyHref =
+    variant === "osago"
+      ? buildOsagoApplyHref(
+          watchedFields?.car_category?.label,
+          watchedFields?.duration_of_stay_osago?.label
+        )
+      : buildNsApplyHref(
+          watchedFields?.duration_of_stay_ns?.value,
+          Number(watchedFields?.number_of_people?.value) || 1
+        );
+
   const renderField = (
     config: IFieldConfig<ICalculatorOsagoForm & ICalculatorNsForm>
   ) => {
@@ -365,6 +381,7 @@ const CalculatorInputForm = ({ config, variant }: IProps) => {
         <CalculatorPolicyPrice
           className={styles.price}
           policyType={variant}
+          applyHref={applyHref}
           price={Number(data ? data.base_tarif : calculateNsData?.base_tariff)}
         />
       )}
