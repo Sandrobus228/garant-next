@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 
 import { Toaster } from "react-hot-toast";
 
@@ -14,6 +14,11 @@ import YandexMetrika from "@/utils/YandexMetrika";
 import TrackPageView from "@/utils/TrackPageView";
 import GoogleAnalytics from "@/utils/GoogleAnalytics";
 import TrackGAView from "@/utils/TrackGAView";
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://garant-abh.com"),
@@ -76,6 +81,19 @@ export default function RootLayout({
         ></meta> */}
       </Head>
       <body>
+        {/*
+          Safari на iOS увеличивает страницу при фокусе на поле со шрифтом
+          мельче 16px и обратно масштаб не возвращает. maximum-scale подавляет
+          именно автозум — жест увеличения на iOS 10+ продолжает работать.
+          Ставим его только для iOS: в Android автозума нет, а тег там лишь
+          отнял бы у пользователя возможность масштабировать страницу.
+        */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){var u=navigator.userAgent;if(/iP(ad|hone|od)/.test(u)||(/Macintosh/.test(u)&&"ontouchend" in document)){var m=document.querySelector('meta[name=viewport]');if(m)m.content="width=device-width, initial-scale=1, maximum-scale=1"}})()`,
+          }}
+        />
+
         <Providers>
           <Header />
           {children}
