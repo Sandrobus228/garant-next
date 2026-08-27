@@ -368,7 +368,7 @@ const CalculatorInputForm = ({ config, variant }: IProps) => {
   };
 
   return (
-    <form className={styles.form} onSubmit={handleSubmit(onSubmit)} action="">
+    <form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
       {config.fields.map((field) => renderField(field))}
       <Button
         className={`${styles.submit} ${data ? styles.submitHidden : ""}`}

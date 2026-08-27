@@ -6,6 +6,26 @@
   padding: 40px;
 }
 
+.title {
+  margin-bottom: 20px;
+}
+
+.subhead {
+  margin-top: 40px;
+  margin-bottom: 16px;
+}
+
+.lead {
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 1.375rem;
+  line-height: 135%;
+}
+
+.leadAccent {
+  font-weight: 700;
+}
+
 .paragraph {
   margin-top: 26px;
   font-family: var(--font-family);
@@ -18,12 +38,112 @@
   color: var(--blue);
   font-family: var(--font-family);
   font-weight: 400;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+/* Ключевые цифры. Четыре плитки: на телефоне складываются в ровный квадрат 2x2,
+   без одинокой плитки в последнем ряду. */
+.facts {
+  margin-top: 30px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.fact {
+  min-width: 0;
+  padding: 18px 20px;
+  border-radius: 14px;
+  background: var(--light-grey);
+}
+
+.factValue {
+  font-family: var(--font-family);
+  font-weight: 700;
+  font-size: 1.5rem;
+  line-height: 120%;
+  color: var(--blue);
+  /* Цифра не переносится: самая длинная строка — «от 1 000 ₽», по ней и считается
+     минимальная ширина плитки. */
+  white-space: nowrap;
+}
+
+.factLabel {
+  margin: 6px 0 0;
+  margin-inline-start: 0;
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 0.9375rem;
+  line-height: 130%;
+  color: var(--grey-3);
+}
+
+/* Строка про проверку на постах: плашка с иконкой, чтобы разбить сплошной
+   текст и дать глазу зацепку при беглом чтении. */
+.notice {
+  margin-top: 26px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px 20px;
+  border-radius: 14px;
+  background: #eef1ff;
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 1.125rem;
+  line-height: 130%;
+  color: var(--dark-grey);
+}
+
+.noticeIcon {
+  flex-shrink: 0;
+  margin-top: 1px;
+  color: var(--blue);
+}
+
+.steps {
+  margin-top: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  list-style: none;
+}
+
+.step {
+  display: grid;
+  grid-template-columns: 34px 1fr;
+  gap: 14px;
+  align-items: start;
+}
+
+.stepNumber {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--light-grey);
+  font-family: var(--font-family);
+  font-weight: 700;
+  font-size: 1rem;
+  line-height: 1;
+  color: var(--blue);
+}
+
+.stepText {
+  padding-top: 5px;
+  font-family: var(--font-family);
+  font-weight: 400;
   font-size: 1.25rem;
   line-height: 125%;
 }
 
 .ul {
-  margin-top: 26px;
+  margin-top: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
   list-style-type: disc;
 }
 
@@ -35,6 +155,19 @@
   line-height: 125%;
 }
 
+.fresh {
+  margin-top: 40px;
+  padding: 16px 20px;
+  border-radius: 14px;
+  border-left: 3px solid var(--blue);
+  background: var(--light-grey);
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 1rem;
+  line-height: 135%;
+  color: var(--grey-3);
+}
+
 @media (max-width: 1149px) {
   .root {
     margin-top: 50px;
@@ -44,9 +177,76 @@
     padding: 15px;
   }
 
+  .title {
+    margin-bottom: 12px;
+  }
+
+  .subhead {
+    margin-top: 30px;
+    margin-bottom: 12px;
+  }
+
+  .lead {
+    font-size: 1rem;
+  }
+
   .paragraph,
-  .link,
-  .li {
+  .li,
+  .stepText {
     font-size: 0.875rem;
+  }
+
+  .notice {
+    margin-top: 22px;
+    gap: 10px;
+    padding: 13px 15px;
+    border-radius: 10px;
+    font-size: 0.9375rem;
+  }
+
+  .noticeIcon {
+    width: 18px;
+    height: 18px;
+  }
+
+  .facts {
+    margin-top: 22px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .fact {
+    padding: 13px 14px;
+    border-radius: 10px;
+  }
+
+  .factValue {
+    font-size: 1.125rem;
+  }
+
+  .factLabel {
+    font-size: 0.8125rem;
+  }
+
+  .step {
+    grid-template-columns: 28px 1fr;
+    gap: 10px;
+  }
+
+  .stepNumber {
+    width: 28px;
+    height: 28px;
+    font-size: 0.875rem;
+  }
+
+  .stepText {
+    padding-top: 4px;
+  }
+
+  .fresh {
+    margin-top: 30px;
+    padding: 13px 15px;
+    border-radius: 10px;
+    font-size: 0.8125rem;
   }
 }

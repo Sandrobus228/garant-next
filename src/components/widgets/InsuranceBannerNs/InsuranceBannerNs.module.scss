@@ -6,37 +6,61 @@
   padding: 40px;
 }
 
+.title {
+  margin-bottom: 20px;
+}
+
+.substrate .subtitle {
+  margin-top: 34px;
+  margin-bottom: 12px;
+  font-size: 1.625rem;
+  line-height: 125%;
+}
+
+.lead {
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 1.375rem;
+  line-height: 135%;
+}
+
 .paragraph {
-  margin-top: 26px;
+  margin-top: 16px;
   font-family: var(--font-family);
   font-weight: 400;
   font-size: 1.25rem;
   line-height: 125%;
+}
+
+/* Что не является страховым случаем: выносим из абзаца, чтобы исключения
+   не терялись в тексте. */
+.exception {
+  margin-top: 18px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px 20px;
+  border-radius: 14px;
+  background: #fff1f1;
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 1.125rem;
+  line-height: 130%;
+  color: var(--dark-grey);
+}
+
+.exceptionIcon {
+  flex-shrink: 0;
+  margin-top: 1px;
+  color: var(--red2);
 }
 
 .link {
   color: var(--blue);
-  font-family: var(--font-family);
-  font-weight: 400;
-  font-size: 1.25rem;
-  line-height: 125%;
+  font-size: inherit;
+  line-height: inherit;
 }
 
-.subtitle {
-  margin-top: 26px;
-}
-
-.ul {
-  list-style-type: disc;
-}
-
-.li {
-  margin-left: 24px;
-  font-family: var(--font-family);
-  font-weight: 400;
-  font-size: 1.25rem;
-  line-height: 125%;
-}
 
 @media (max-width: 1149px) {
   .root {
@@ -47,9 +71,34 @@
     padding: 15px;
   }
 
-  .paragraph,
-  .link,
-  .li {
+  .title {
+    margin-bottom: 12px;
+  }
+
+  .substrate .subtitle {
+    margin-top: 26px;
+    margin-bottom: 10px;
+    font-size: 1.125rem;
+  }
+
+  .lead {
+    font-size: 1rem;
+  }
+
+  .paragraph {
     font-size: 0.875rem;
   }
+
+  .exception {
+    gap: 10px;
+    padding: 13px 15px;
+    border-radius: 10px;
+    font-size: 0.9375rem;
+  }
+
+  .exceptionIcon {
+    width: 18px;
+    height: 18px;
+  }
+
 }

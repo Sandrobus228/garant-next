@@ -6,32 +6,83 @@
   padding: 40px;
 }
 
+.title {
+  margin-bottom: 20px;
+}
+
+.substrate .subtitle {
+  margin-top: 34px;
+  margin-bottom: 12px;
+  font-size: 1.625rem;
+  line-height: 125%;
+}
+
+.lead {
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 1.375rem;
+  line-height: 135%;
+}
+
 .paragraph {
-  margin-top: 26px;
   font-family: var(--font-family);
   font-weight: 400;
   font-size: 1.25rem;
   line-height: 125%;
 }
 
-.link {
+/* Ключевое исключение вынесено в плашку: без регистрации ДТП в ДПС выплаты нет,
+   и это стоит увидеть до того, как человек дочитает список. */
+.warning {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px 20px;
+  border-radius: 14px;
+  background: #fff1f1;
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 1.125rem;
+  line-height: 130%;
+  color: var(--dark-grey);
+}
+
+.warningIcon {
+  flex-shrink: 0;
+  margin-top: 1px;
+  color: var(--red2);
+}
+
+.steps {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  list-style: none;
+}
+
+.step {
+  display: grid;
+  grid-template-columns: 34px 1fr;
+  gap: 14px;
+  align-items: start;
+}
+
+.stepNumber {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--light-grey);
+  font-family: var(--font-family);
+  font-weight: 700;
+  font-size: 1rem;
+  line-height: 1;
   color: var(--blue);
-  font-family: var(--font-family);
-  font-weight: 400;
-  font-size: 1.25rem;
-  line-height: 125%;
 }
 
-.subtitle {
-  margin-top: 26px;
-}
-
-.ul {
-  list-style-type: disc;
-}
-
-.li {
-  margin-left: 24px;
+.stepText {
+  padding-top: 5px;
   font-family: var(--font-family);
   font-weight: 400;
   font-size: 1.25rem;
@@ -47,9 +98,49 @@
     padding: 15px;
   }
 
+  .title {
+    margin-bottom: 12px;
+  }
+
+  .substrate .subtitle {
+    margin-top: 26px;
+    margin-bottom: 10px;
+    font-size: 1.125rem;
+  }
+
+  .lead {
+    font-size: 1rem;
+  }
+
   .paragraph,
-  .link,
-  .li {
+  .stepText {
     font-size: 0.875rem;
+  }
+
+  .warning {
+    gap: 10px;
+    padding: 13px 15px;
+    border-radius: 10px;
+    font-size: 0.9375rem;
+  }
+
+  .warningIcon {
+    width: 18px;
+    height: 18px;
+  }
+
+  .step {
+    grid-template-columns: 28px 1fr;
+    gap: 10px;
+  }
+
+  .stepNumber {
+    width: 28px;
+    height: 28px;
+    font-size: 0.875rem;
+  }
+
+  .stepText {
+    padding-top: 4px;
   }
 }

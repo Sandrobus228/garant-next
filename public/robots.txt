@@ -1,14 +1,38 @@
-User-Agent: *
-
+User-agent: *
 Disallow: /*?*
+Disallow: /dashboard
+Disallow: /new-car
+Disallow: /edit-car
+Disallow: /auth
+Disallow: /password
+Disallow: /policy-info
+Disallow: /email-verify-result
+Disallow: /osago/confirm
+Disallow: /ns/confirm
 
-Sitemap: https://garant-abh.com/sitemap.xml
+User-agent: GoogleBot
+Disallow: /dashboard
+Disallow: /new-car
+Disallow: /edit-car
+Disallow: /auth
+Disallow: /password
+Disallow: /policy-info
+Disallow: /email-verify-result
+Disallow: /osago/confirm
+Disallow: /ns/confirm
 
-
-User-Agent: Yandex
-
+User-agent: Yandex
+Disallow: /dashboard
+Disallow: /new-car
+Disallow: /edit-car
+Disallow: /auth
+Disallow: /password
+Disallow: /policy-info
+Disallow: /email-verify-result
+Disallow: /osago/confirm
+Disallow: /ns/confirm
 Clean-param: type&id&MNT_TRANSACTION_ID&MNT_ID&MNT_OPERATION_ID&MNT_OPERAT&MNT_OPERA&_ym_debug&MNT_OPER
 Clean-param: hl&email&verified&message&token
 
-
 Sitemap: https://garant-abh.com/sitemap.xml
+Host: garant-abh.com

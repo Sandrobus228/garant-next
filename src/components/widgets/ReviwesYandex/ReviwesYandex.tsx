@@ -5,7 +5,12 @@ import styles from "./ReviwesYandex.module.scss";
 import CustomTitle from "@/components/ui/CustomTitle/CustomTitle";
 import ContentContainer from "@/components/ui/ContentContainer/ContentContainer";
 
-const ReviwesYandex = () => {
+interface IProps {
+  /** Заголовок блока: на каждой странице свой, иначе h2 дублируется по сайту. */
+  title?: string;
+}
+
+const ReviwesYandex = ({ title = "Отзывы о нас" }: IProps) => {
   const [isVisible, setIsVisible] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -28,7 +33,7 @@ const ReviwesYandex = () => {
     <ContentContainer>
       <section className={styles.root}>
         <CustomTitle tag="h2" isCentered className={styles.title} isLarge>
-          Отзывы о нас
+          {title}
         </CustomTitle>
 
         <div className={styles.reviewsWrapper} ref={ref}>
@@ -50,7 +55,7 @@ const ReviwesYandex = () => {
             target="_blank"
             rel="nofollow noopener"
           >
-            Гарант Страхование на карте Москвы — Яндекс.Карты
+            Гарант-Страхование на Яндекс.Картах, Сухум
           </a>
         </div>
       </section>

@@ -82,7 +82,12 @@ const Article = ({ article }: Props) => {
           Остались вопросы? Свяжитесь с нами!{" "}
           <br />
           Позвоните нам или{" "}
-          <a href="https://wa.me/79407411000" rel="nofollow" className={styles.whatsappLink}>
+          <a
+            href="https://wa.me/79407411000"
+            target="_blank"
+            rel="nofollow noopener"
+            className={styles.whatsappLink}
+          >
             напишите в <span className={styles.textBold}>WhatsApp</span>
           </a>{" "}
           по номеру:

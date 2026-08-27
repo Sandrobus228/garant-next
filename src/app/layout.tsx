@@ -7,7 +7,6 @@ import Footer from "@/components/widgets/Footer/Footer";
 
 import "./globals.scss";
 
-import Head from "next/head";
 import { Providers } from "./providers";
 import Shadow from "@/components/ui/Shadow/Shadow";
 import YandexMetrika from "@/utils/YandexMetrika";
@@ -31,11 +30,12 @@ export const metadata: Metadata = {
     absolute: "Страховка в Абхазии – ОСАГО онлайн | Гарант-Страхование",
   },
   description:
-    "Предлагаем оформить обязательную и необязательную страховку в Абхазии. Гарантируем подлинность выдаваемого документа. Полис установленного образца. Работаем с юридическими и физическими лицами. Располагаем доступными ценами. Предлагаем программу лояльности для постоянных клиентов, сезонные скидки на услуги.",
+    "Страховка в Абхазии на автомобиль от 1 000 ₽ за 15 суток. Полис ОСАГО онлайн за 3–5 минут, приходит на email. Штраф за отсутствие полиса – 3 000 ₽.",
+  manifest: "/favicon/site.webmanifest",
   openGraph: {
     siteName: "Гарант-Страхование",
-    description: "Страхование в Абхазии онлайн. Быстро, надёжно, официально."
-  }
+    description: "Страхование в Абхазии онлайн. Быстро, надёжно, официально.",
+  },
 };
 
 export default function RootLayout({
@@ -45,55 +45,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ru">
-      <Head>
-        <link rel="icon" href="/favicon/favicon.ico" />
-        <link rel="apple-touch-icon" href="/favicon/apple-touch-icon.png" />
-        <link
-          rel="icon"
-          type="image/png"
-          sizes="32x32"
-          href="/favicon/favicon-32x32.png"
-        />
-        <link
-          rel="icon"
-          type="image/png"
-          sizes="16x16"
-          href="/favicon/favicon-16x16.png"
-        />
-        <link
-          rel="icon"
-          type="image/png"
-          sizes="192x192"
-          href="/favicon/android-chrome-192x192.png"
-        />
-        <link
-          rel="icon"
-          type="image/png"
-          sizes="512x512"
-          href="/favicon/android-chrome-512x512.png"
-        />
-        <link rel="manifest" href="/favicon/site.webmanifest" />
-
-        {/* <meta property="og:site_name" content="Гарант-Страхование"></meta> */}
-        {/* <meta
-          property="og:description"
-          content="Страхование в Абхазии онлайн. Быстро, надёжно, официально."
-        ></meta> */}
-      </Head>
       <body>
-        {/*
-          Safari на iOS увеличивает страницу при фокусе на поле со шрифтом
-          мельче 16px и обратно масштаб не возвращает. maximum-scale подавляет
-          именно автозум — жест увеличения на iOS 10+ продолжает работать.
-          Ставим его только для iOS: в Android автозума нет, а тег там лишь
-          отнял бы у пользователя возможность масштабировать страницу.
-        */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `(function(){var u=navigator.userAgent;if(/iP(ad|hone|od)/.test(u)||(/Macintosh/.test(u)&&"ontouchend" in document)){var m=document.querySelector('meta[name=viewport]');if(m)m.content="width=device-width, initial-scale=1, maximum-scale=1"}})()`,
-          }}
-        />
-
         <Providers>
           <Header />
           {children}

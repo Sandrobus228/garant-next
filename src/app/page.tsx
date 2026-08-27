@@ -12,8 +12,8 @@ export default function Home() {
       <CalculatorPromo />
       <Advantages />
       <InsuranceBannerMain />
-      <ReviwesYandex />
-      <FAQ isIsolated />
+      <ReviwesYandex title="Отзывы клиентов о «Гарант-Страховании»" />
+      <FAQ isIsolated set="home" title="Частые вопросы о страховке в Абхазии" />
     </div>
   );
 }

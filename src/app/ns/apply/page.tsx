@@ -8,6 +8,9 @@ import {
 import type { Metadata } from "next";
 
 import "react-day-picker/style.css";
+import { formPageViewport } from "@/config/viewport.config";
+
+export const viewport = formPageViewport;
 
 export const metadata: Metadata = {
   title: "Оформить полис от несчастного случая в Абхазии онлайн",

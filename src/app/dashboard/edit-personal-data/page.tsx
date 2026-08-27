@@ -3,6 +3,9 @@ import EditPersonalData from "@/components/widgets/EditPersonalData/EditPersonal
 import type { Metadata } from "next";
 
 import "react-day-picker/style.css";
+import { formPageViewport } from "@/config/viewport.config";
+
+export const viewport = formPageViewport;
 
 export const metadata: Metadata = {
   title: "Личный кабинет",

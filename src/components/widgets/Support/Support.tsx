@@ -14,13 +14,14 @@ const Support = () => {
     <section>
       <ContentContainer>
         <Substrate withShadow="light" className={styles.substrate}>
-          <FAQ isBordered />
+          <FAQ isBordered title="Ответы на вопросы о страховке в Абхазии" />
 
           <Text className={styles.text}>
             Остались вопросы? Свяжитесь с нами! Позвоните нам или{" "}
             <a
               href="https://wa.me/79407411000"
-              rel="nofollow"
+              target="_blank"
+              rel="nofollow noopener"
               className={styles.whatsappLink}
             >
               напишите в <span className={styles.textBold}>WhatsApp</span>

@@ -2,9 +2,7 @@ import { PAGES } from "./pages-url.config";
 
 export const publicPages: string[] = [
   PAGES.ABOUT,
-  PAGES.CALCULATOR,
   PAGES.CONTACTS,
-  PAGES.DOCUMENTS,
   PAGES.DOCUMENTS,
   PAGES.SUPPORT,
   PAGES.HOME,

@@ -5,29 +5,31 @@ import FAQ from "@/components/widgets/FAQ/FAQ";
 import { InsuranceBannerOsago } from "@/components/widgets/InsuranceBannerOsago/InsuranceBannerOsago";
 import PolicyPromo from "@/components/widgets/PolicyPromo/PolicyPromo";
 import ReviwesYandex from "@/components/widgets/ReviwesYandex/ReviwesYandex";
+import TariffTable from "@/components/widgets/TariffTable/TariffTable";
 import Breadcrumbs from "@/components/ui/Breadcrumbs/Breadcrumbs";
 import { PAGES } from "@/config/pages-url.config";
 import type { Metadata } from "next";
 
 const audienceItems: IAudienceInfoItem[] = [
   {
-    title: "Соблюдение закона",
-    description: "Оформите заранее, чтобы избежать штрафов и проблем на дороге",
-    imageAlt: "scales",
+    title: "Обязателен по закону",
+    description:
+      "Требование действует с 2022 года, за отсутствие полиса штрафуют на 3 000 ₽",
+    imageAlt: "Весы правосудия",
     imageUrl: "/img/scales.png",
   },
   {
-    title: "Финансовая безопасность",
+    title: "Выплата до 50 000 ₽",
     description:
-      "Страховка покроет ущерб третьим лицам и защитит вас от расходов",
-    imageAlt: "cash",
+      "Столько получит пострадавшая сторона, если виновником ДТП окажетесь вы",
+    imageAlt: "Денежные купюры",
     imageUrl: "/img/cash.png",
   },
   {
-    title: "Спокойствие в поездке",
+    title: "Действует по всей Абхазии",
     description:
-      "Наслаждайтесь путешествием в безопасности и без лишних хлопот",
-    imageAlt: "meditation",
+      "Полис работает на всей территории республики весь выбранный срок",
+    imageAlt: "Спокойный отдых",
     imageUrl: "/img/meditation.png",
   },
 ];
@@ -35,7 +37,7 @@ const audienceItems: IAudienceInfoItem[] = [
 export const metadata: Metadata = {
   title: "ОСАГО в Абхазии – страховка онлайн для граждан РФ",
   description:
-    "Оформить страховку для поездки в Абхазию. Получите полис Гарант-Страхования на вашу почту. Рассчитать цену со скидкой 10%.",
+    "ОСАГО в Абхазии для россиян: тарифы на все категории транспорта, от 1 000 ₽ за 15 суток. Полис онлайн за 3–5 минут, приходит на email.",
 };
 
 export default function OsagoPage() {
@@ -50,12 +52,17 @@ export default function OsagoPage() {
       {/* <DiscountBanner /> */}
       <PolicyPromo variant="osago" />
       <AudienceInfoBlock
-        title="Почему нужно оформить ОСАГО?"
+        title="Почему нужен полис ОСАГО"
         audienceItems={audienceItems}
       />
       <InsuranceBannerOsago />
-      <ReviwesYandex />
-      <FAQ isIsolated />
+      <TariffTable variant="osago" isAttached />
+      <ReviwesYandex title="Отзывы об оформлении ОСАГО" />
+      <FAQ
+        isIsolated
+        set="osago"
+        title="Вопросы об ОСАГО в Абхазии"
+      />
     </div>
   );
 }

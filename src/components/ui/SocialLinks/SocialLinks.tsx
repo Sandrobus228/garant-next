@@ -12,10 +12,18 @@ interface IProps {
 const SocialLinks = ({ className }: IProps) => {
   return (
     <div className={`${styles.socialLinks} ${className}`}>
-      <a href="https://t.me/garantabh" rel="nofollow">
+      <a
+        href="https://t.me/garantabh"
+        target="_blank"
+        rel="nofollow noopener"
+      >
         <SvgSelector id={ESvgName.TELEGRAM_ROUNDED} />
       </a>
-      <a href="https://wa.me/79407411000" rel="nofollow">
+      <a
+        href="https://wa.me/79407411000"
+        target="_blank"
+        rel="nofollow noopener"
+      >
         <SvgSelector id={ESvgName.WHATSAPP_ROUNDED} />
       </a>
       <a href="mailto:info@garant-abh.com" rel="nofollow">

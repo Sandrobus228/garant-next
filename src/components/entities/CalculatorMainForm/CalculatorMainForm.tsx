@@ -16,13 +16,17 @@ export interface ICalculatorMainFormProps {
   variant: "osago" | "ns";
 }
 
+// Заголовок этого блока – единственный h1 главной: блок стоит первым в разметке,
+// и до правки h1 из текстового блока ниже шёл в DOM после h2 калькулятора.
+// В подзаголовке держим цену: именно оттуда цифра попадает в сниппет выдачи.
 const titles = {
-  osago: "Полис ОСАГО в Абхазии",
-  ns: "Полис от несчастного случая в Абхазии",
+  osago: "Страховка в Абхазии на автомобиль",
+  ns: "Страховка от несчастного случая в Абхазии",
 };
 
 const subtitles = {
-  osago: "Обязательное страхование автомобиля для въезда в Абхазию",
+  osago:
+    "Обязательное страхование для въезда в Абхазию. Полис онлайн за 3–5 минут, от 1 000 ₽ за 15 суток.",
   ns: "Обязательное страхование жизни и здоровья иностранных граждан в Абхазии",
 };
 
@@ -31,7 +35,7 @@ const CalculatorMainForm = ({ variant }: ICalculatorMainFormProps) => {
   return (
     <Substrate withShadow="light" className={styles.root}>
       <div className={styles.formWrapper}>
-        <CustomTitle tag="h2" isLarge className={styles.title}>{titles[variant]}</CustomTitle>
+        <CustomTitle className={styles.title}>{titles[variant]}</CustomTitle>
         <p className={styles.subtitle}>{subtitles[variant]}</p>
         {variant === "osago" ? (
           <CalculatorInputForm variant="osago" config={{ fields: selectsOsagoProps }} />

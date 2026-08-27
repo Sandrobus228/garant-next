@@ -8,20 +8,20 @@ import { IAdvantageCards } from "@/components/entities/AdvantagesCard/advantages
 const advantageCards: IAdvantageCards[] = [
   {
     image: "/img/icons/timer.svg",
-    title: "Быстро",
+    title: "Полис за 5 минут",
     descr: "Получите полис онлайн без ожидания в очередях",
     alt: "Таймер",
   },
   {
     image: "/img/icons/wallet.svg",
-    title: "Выгодно",
-    descr: "Выберите для себя лучшие условия в пару кликов",
+    title: "Лучшая цена",
+    descr: "Покупайте только то, что нужно именно вам",
     alt: "Кошелек",
   },
   {
     image: "/img/icons/folder.svg",
-    title: "Удобно",
-    descr: "Полис всегда с собой и доступен в любой момент",
+    title: "Всегда в телефоне",
+    descr: "Электронный полис примут с экрана, распечатывать не нужно",
     alt: "Папка",
   },
 ];

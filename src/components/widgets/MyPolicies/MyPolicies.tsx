@@ -79,7 +79,12 @@ const MyPolicies = () => {
         <CustomTitle tag="h2">
           Внимание! Сайт в разработке. После оплаты писать в What’sApp по номеру
         </CustomTitle>
-        <CustomLink href="https://wa.me/79407411000" variant="underline">
+        <CustomLink
+          href="https://wa.me/79407411000"
+          variant="underline"
+          target="_blank"
+          rel="nofollow noopener"
+        >
           +79407411000
         </CustomLink>
       </Substrate>
